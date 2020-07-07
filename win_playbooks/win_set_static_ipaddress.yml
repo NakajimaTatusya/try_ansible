@@ -1,4 +1,5 @@
 ---
+  # TODO:改善の必要あり
     - hosts: winsvr
       gather_facts: true
 
