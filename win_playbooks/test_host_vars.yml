@@ -1,0 +1,14 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: "test host variables"
+          debug:
+            msg: "{{ foo_agent_port }} and {{ bar_agent_port }}"
+
+        - name: "ホスト変数から、db ディクショナリの user を参照する"
+          debug:
+            msg: "従業員のメールアドレスは{{ item.email }}です。IDは{{ item.id }}です。"
+          with_items: "{{ employee }}"
+...

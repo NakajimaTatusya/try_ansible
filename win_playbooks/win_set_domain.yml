@@ -1,0 +1,22 @@
+---
+    #
+    # 2020/7/6,14:40,tnakajima,"DryRun のみ実行"
+    #
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: "Domain を設定する"
+          win_domain_membership:
+            dns_domain_name: "{{ hv_dns_domain_name }}"
+            hostname: "{{ hv_host_name }}"
+            domain_admin_user: "{{ hv_domain_admin_user }}"
+            domain_admin_password: "{{ hv_domain_admin_password }}"
+            domain_ou_path: "{{ hv_domain_ou_path }}"
+            state: "{{ hv_win_domain_membership_state }}"
+          register: _result_domain_membership
+
+        - name: "再起動の実行"
+          win_reboot:
+          when: _result_domain_membership.reboot_required
+...

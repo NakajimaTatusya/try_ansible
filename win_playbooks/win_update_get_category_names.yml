@@ -1,0 +1,16 @@
+---
+    - name: Windows Update by Ansible
+      hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: get category names.
+          win_updates:
+            state: searched
+          register: update_result
+
+        - name: Debug display update results
+          debug:
+            var: update_result
+            verbosity: 0
+...

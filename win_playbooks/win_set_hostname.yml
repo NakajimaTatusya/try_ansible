@@ -1,0 +1,23 @@
+---
+    - name: Windows Server 2016 のホスト名を設定する
+      hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: "ホスト名の設定"
+          win_hostname: 
+            name: "{{ hv_host_name }}"
+          register: _result_hostname
+
+        - name: "変更前のホスト名"
+          debug:
+            msg: "{{ _result_hostname.old_name }}"
+
+        - name: "Windows Server 2016 の再起動"
+          win_reboot:
+          when: _result_hostname.reboot_required
+
+        - name: "再起動完了"
+          debug:
+            msg: "再起動完了しました。"
+...

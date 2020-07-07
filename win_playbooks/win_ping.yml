@@ -1,0 +1,11 @@
+---
+    - hosts: winsvr
+      gather_facts: true
+
+      tasks:
+        - name: ping to windows server
+          win_ping:
+
+        - name: get windows server informations
+          debug: var=ansible_facts
+...

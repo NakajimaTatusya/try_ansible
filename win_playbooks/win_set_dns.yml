@@ -1,0 +1,12 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: "DNSを設定する"
+          win_dns_client:
+            adapter_name: "イーサネット"
+            ipv4_addresses:
+                - 192.168.34.5
+                - 192.168.34.6
+...
