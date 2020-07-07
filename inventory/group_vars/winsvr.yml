@@ -1,0 +1,8 @@
+---
+    ansible_user: usernaem belong to the administrators group
+    ansible_password: user-password
+    ansible_connection: winrm
+    ansible_port: 5985
+    ansible_winrm_server_cert_validation: ignore
+    gv_start_page_url: "https://rfgricoh.sharepoint.com/sites/rfgportal/"
+...

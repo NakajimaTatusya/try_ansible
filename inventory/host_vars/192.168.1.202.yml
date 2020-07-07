@@ -1,0 +1,11 @@
+---
+  hv_static_ipv4: 192.168.1.204
+  hv_default_gateway: 192.168.1.1
+  hv_host_name: <<有効な値に変更してください>>
+  hv_dns_domain_name: <<有効な値に変更してください>>
+  hv_domain_admin_password: <<有効な値に変更してください>>
+  hv_domain_admin_user: <<有効な値に変更してください>>
+  hv_domain_ou_path: "<<有効な値に変更してください>>"
+  hv_win_domain_membership_state: <<有効な値に変更してください>>
+  hv_workgroup_name: <<有効な値に変更してください>>
+...
