@@ -13,7 +13,7 @@
     * group_vars\
     * host_vars\
     * hosts
-  * win_playbooks
+  * win_playbooks\
     * ansible.cfg
 
 ## システム構成概略
