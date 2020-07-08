@@ -1,4 +1,6 @@
 ---
   hv_static_ipv4: 192.168.1.203
   hv_default_gateway: 192.168.1.1
+  vh_dns_ipv4: 
+    - 192.168.1.1
 ...
