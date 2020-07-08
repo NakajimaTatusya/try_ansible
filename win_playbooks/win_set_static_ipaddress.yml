@@ -1,47 +1,75 @@
 ---
-  # TODO:改善の必要あり
-    - hosts: winsvr
-      gather_facts: true
+  - hosts: winsvr
+    gather_facts: true
 
-      tasks:
-        #- name: Display win_facs
-        #  debug:
-        #    var: ansible_facts
+    tasks:
+      #- name: Display win_facs
+      #  debug:
+      #    var: ansible_facts
 
-        - name: "DefaultGatewayが設定存在するか確認する"
-          win_shell: "{% raw %}Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object{$_.IPEnabled -eq 'TRUE'} | Format-List DefaultIPGateway{% endraw %}"
-          register: _result_shell
+      #- name: "DefaultGatewayが設定存在するか確認する"
+      #  win_shell: "{% raw %}Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object{$_.IPEnabled -eq 'TRUE'} | Format-List DefaultIPGateway{% endraw %}"
+      #  register: _result_shell
 
-        #- debug:
-        #    var: _result_shell
+      #- debug:
+      #    var: _result_shell.stdout
 
-        - name: "静的 IP アドレスを設定する（DefaultGatewayが設定されていない）"
-          win_shell: "Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | New-NetIpAddress -IpAddress {{ hv_static_ipv4 }} -PrefixLength 24 -DefaultGateway {{ hv_default_gateway }}"
-          async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
-          poll: 0
-          when: _result_shell.stdout == ""
+      #- name: PowerShell で静的IPアドレス、DefaultGatewayを変更する
+      #  script: ../powershells/set_staticip_defaultgateway_dns.ps1 'イーサネット' "{{ hv_static_ipv4 }}" "{{ hv_default_gateway }}"
 
-        #- debug:
-        #    msg: "Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | New-NetIpAddress -IpAddress {{ hv_static_ipv4 }} -PrefixLength 24"
+      #- pause:
+      #    seconds: 15
 
-        - name: "静的 IP アドレスを設定する（DefaultGatewayが設定されている）"
-          win_shell: "Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | New-NetIpAddress -IpAddress {{ hv_static_ipv4 }} -PrefixLength 24"
-          #win_shell: "Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | Set-NetIPAddress -InterfaceAlias 'イーサネット' -AddressFamily IPv4 -IPAddress {{ hv_static_ipv4 }} -PrefixLength 24"
-          async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
-          poll: 0
-          when: _result_shell.stdout != ""
+      - name: PowerShell で静的IPアドレス、DefaultGatewayを変更する
+        win_shell: |
+          Get-NetAdapter | Remove-NetRoute -DestinationPrefix 0.0.0.0/0 -confirm:$false
+          Get-NetAdapter | Remove-NetIPAddress -confirm:$false
+          Start-Sleep 10
+          Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | New-NetIpAddress -IpAddress {{ hv_static_ipv4 }} -PrefixLength 24 -DefaultGateway {{ hv_default_gateway }}
+        async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
+        poll: 0
 
-        - name: Change ansible's ip address for each host
-          set_fact:
-            ansible_host: "{{ hv_static_ipv4 }}"
-  
-        - name: Wait for the hosts network interface to come back up
-          local_action:
-            module: wait_for
-            host: "{{ ansible_host }}"
-            port: 5985
-            delay: 10
-            state: started
-            timeout: 30
-          register: _result_wait
+      #- name: DefaultGateway の解除
+      #  win_shell: "Get-NetAdapter | Remove-NetRoute -DestinationPrefix 0.0.0.0/0 -confirm:$false"
+      #  async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
+      #  poll: 0
+      
+      #- name: IPアドレス設定の解除
+      #  win_shell: "Get-NetAdapter | Remove-NetIPAddress -confirm:$false"
+      #  async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
+      #  poll: 0
+
+      #- name: "静的 IP アドレスとDefaultGatewayを設定する"
+      #  win_shell: "Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | New-NetIpAddress -IpAddress {{ hv_static_ipv4 }} -PrefixLength 24 -DefaultGateway {{ hv_default_gateway }}"
+      #  async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
+      #  poll: 0
+      #- name: "静的 IP アドレスとDefaultGatewayを設定する"
+      #  win_shell: "Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | New-NetIpAddress -IpAddress {{ hv_static_ipv4 }} -PrefixLength 24"
+      #  async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
+      #  poll: 0
+        #when: _result_shell.stdout | regex_findall('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b') != hv_default_gateway
+
+      - name: Change ansible's ip address for each host
+        set_fact:
+          ansible_host: "{{ hv_static_ipv4 }}"
+
+      - name: Wait for the hosts network interface to come back up
+        local_action:
+          module: wait_for
+          host: "{{ ansible_host }}"
+          port: 5985
+          delay: 10
+          state: started
+          timeout: 30
+        register: _result_wait
+       
+      #- name: "静的 IP アドレスを設定する"
+      #  win_shell: "Get-NetIPAddress -interfaceAlias 'イーサネット' -AddressFamily IPv4 | New-NetIpAddress -IpAddress {{ hv_static_ipv4 }} -PrefixLength 24"
+      #  async: 100 # Using "fire-and-forget" asynchronous execution for this task, otherwise it will always fail and timeout
+      #  poll: 0
+      #  when: _result_shell.stdout | regex_findall('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b') == hv_default_gateway
+
+      #- name: Change ansible's ip address for each host
+      #  set_fact:
+      #    ansible_host: "{{ hv_static_ipv4 }}"
 ...
