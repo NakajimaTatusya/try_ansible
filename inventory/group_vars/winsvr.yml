@@ -1,8 +1,43 @@
 ---
-    ansible_user: usernaem belong to the administrators group
-    ansible_password: user-password
+    ansible_user: Administrator
+    ansible_password: Passw0rd
     ansible_connection: winrm
     ansible_port: 5985
     ansible_winrm_server_cert_validation: ignore
+    # IE Start page url
     gv_start_page_url: "https://rfgricoh.sharepoint.com/sites/rfgportal/"
+    # ZoneMap:Range
+    gv_list_add_url:
+      - ipaddress_data: 100.100.100.1
+        protocol_name: http
+        protocol_id: 1
+        suffix_num: 1001
+      - ipaddress_data: 100.100.100.2
+        protocol_name: https
+        protocol_id: 2
+        suffix_num: 1002
+      - ipaddress_data: 100.100.100.3
+        protocol_name: http
+        protocol_id: 3
+        suffix_num: 1003
+      - ipaddress_data: 100.100.100.4
+        protocol_name: file
+        protocol_id: 4
+        suffix_num: 1004
+    # ZoneMap:Domains
+    gv_list_add_domain:
+      - domain_string: intranet_web_site
+        protocol_name: http
+        protocol_id: 1
+      - domain_string: hogehoge.com
+        protocol_name: https
+        protocol_id: 2
+    # ie or winhttp 設定
+    gv_proxy: http=example.local:8080;https=sample.local:8443
+    # 除外リスト
+    gv_list_bypass:
+      - <-loopback>
+      - <local>
+      - 10.*.*.*
+      - "*.hogehoge.local"
 ...
