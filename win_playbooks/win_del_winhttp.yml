@@ -1,0 +1,15 @@
+---
+    # netsh winhttp show proxy
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: Set windows HTTP service
+          win_http_proxy:
+            proxy: ""
+            bypass: ""
+
+        #- name: Set windows HTTP service from internet explorer
+        #  win_http_proxy:
+        #    source: ie
+...
