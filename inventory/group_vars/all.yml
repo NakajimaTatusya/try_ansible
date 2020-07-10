@@ -1,4 +1,4 @@
 ---
     # Global variables
-
+    gv_peers: "ntp.nict.jp ntp.nc.u-tokyo.ac.jp 210.173.162.106"
 ...
