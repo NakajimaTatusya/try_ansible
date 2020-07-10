@@ -1,0 +1,33 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      vars:
+        clsids:
+          - [
+             "{20D04FE0-3AEA-1069-A2D8-08002B30309D}", # PC ICON
+             "{645FF040-5081-101B-9F08-00AA002F954E}", # Garbage Box ICON
+             "{59031a47-3f72-44a7-89c5-5595fe6b30ee}", # User Folder ICON
+             "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}", # Control Panel ICON
+             "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" # Network ICON
+             # "{031E4825-7B94-4dc3-B131-E946B44C8DD5}", # liblary
+             # "{018D5C66-4533-4307-9B53-224DE2ED1FE6}", # One Drive
+            ]
+
+      tasks:
+        #- name: indexed loop confirm
+        #  debug:
+        #    msg: "{{ item }}"
+        #  with_flattened:
+        #    - "{{ clsids }}"
+
+        - name: Display PC GarbageBox UserFolders ControlPanel and Network icons on the desktop
+          win_regedit:
+              path: HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel
+              name: "{{ item }}"
+              data: 0 # 0:表示、1：非表示
+              type: DWORD
+              state: present
+          with_flattened:
+            - "{{ clsids }}"
+...
