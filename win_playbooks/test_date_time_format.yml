@@ -1,0 +1,49 @@
+---
+    # 日付フォーマットと日付でファイル名の例
+    # !!!ファクト情報収集の実行は必須!!!
+  - hosts: windows
+    gather_facts: true
+
+    tasks:
+      - debug:
+          var=ansible_date_time.date
+      - debug:
+          var: ansible_date_time.day
+      - debug: msg="{{ ansible_date_time.epoch }}"
+      - debug:
+          msg="{{ ansible_date_time.hour }}"
+      - debug:
+          msg: "{{ ansible_date_time.iso8601 }}"
+      - debug:
+          msg: "{{ ansible_date_time.iso8601_basic }}"
+      - debug:
+          msg: "{{ ansible_date_time.iso8601_basic_short }}"
+      - debug:
+          msg: "{{ ansible_date_time.iso8601_micro }}"
+      - debug:
+          msg: "{{ ansible_date_time.minute }}"
+      - debug:
+          msg: "{{ ansible_date_time.month }}"
+      - debug:
+          msg: "{{ ansible_date_time.second }}"
+      - debug:
+          msg: "{{ ansible_date_time.time }}"
+      - debug:
+          msg: "{{ ansible_date_time.tz }}"
+      - debug:
+          msg: "{{ ansible_date_time.tz_offset }}"
+      - debug:
+          msg: "{{ ansible_date_time.weekday }}"
+      - debug:
+          msg: "{{ ansible_date_time.weekday_number }}"
+      - debug:
+          msg: "{{ ansible_date_time.weeknumber }}"
+      - debug:
+          msg: "{{ ansible_date_time.year }}"
+      - debug:
+          msg: "{{ lookup('pipe', 'date') }}"
+      - debug:
+          msg: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}"
+      - debug:
+          msg: "ansible_win_update_{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}.log"
+...
