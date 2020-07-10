@@ -1,0 +1,14 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: Disable Domain, Private and Public firewalls
+          win_firewall:
+            state: disabled
+            profiles:
+                - Domain
+                - Private
+                - Public
+          tags: disable_firewall
+...
