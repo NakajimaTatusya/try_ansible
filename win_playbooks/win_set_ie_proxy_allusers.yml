@@ -14,13 +14,18 @@
         - name: Configure IE LAN settings
           win_inet_proxy:
             auto_detect: no
-            proxy:
-                http: example.co.jp:8080
-                #https:
-                #ftp: 
-                #socks: 
-            bypass:
-                - <local>
-                - <-loopback>
-                - 10.*.*.*
+            proxy: "{{ gv_proxy }}"
+            bypass: "{{ gv_list_bypass }}"
+
+        #- name: Configure IE LAN settings
+        #  win_inet_proxy:
+        #    auto_detect: no
+        #    proxy: 
+        #      http: example.com:8080
+        #      https: sample.com:443
+        #    bypass:
+        #      - <local>
+        #      - <-loopback>
+        #      - 10.*.*.*
+        #      - "*.hogehoge.com"
 ...
