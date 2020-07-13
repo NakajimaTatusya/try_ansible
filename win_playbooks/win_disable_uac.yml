@@ -1,0 +1,50 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      vars:
+        _uac_disable:
+            - path: HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System
+              name: EnableLUA
+              data: 0
+        _uac_popup_ctrl:
+            - path: HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System
+              name: ConsentPromptBehaviorAdmin
+              data: 0
+            - path: HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System
+              name: ConsentPromptBehaviorAdmin
+              data: 5
+
+      tasks:
+        - name: Disable UAC
+          win_regedit:
+            path: "{{ _uac_disable[0].path }}"
+            name: "{{ _uac_disable[0].name }}"
+            data: "{{ _uac_disable[0].data }}"
+            type: DWORD
+            state: present
+
+        #- block:
+        #    - name: Disable UAC popup for Administrators
+        #      win_regedit:
+        #        path: "{{ _uac_popup_ctrl[0].path }}"
+        #        name: "{{ _uac_popup_ctrl[0].name }}"
+        #        data: "{{ _uac_popup_ctrl[0].data }}"
+        #        type: DWORD
+        #        state: present
+
+        #    - name: anythong todo
+        #      debug:
+        #        msg: "UAC ポップアップを抑制し、何かの処理を実行する"
+
+        # always:
+        #    - name: Enable UAC popup for Administrators
+        #      win_regedit:
+        #        path: "{{ _uac_popup_ctrl[1].path }}"
+        #        name: "{{ _uac_popup_ctrl[1].name }}"
+        #        data: "{{ _uac_popup_ctrl[1].data }}"
+        #        type: DWORD
+        #        state: present
+        #    - debug:
+        #        msg: "何かの処理が終わったら、UAC ポップアップを元に戻す"
+...
