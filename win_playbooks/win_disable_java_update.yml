@@ -1,0 +1,19 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      vars:
+        _disable_java_update:
+            - path: HKLM:\SOFTWARE\JavaSoft\Java Update\Policy
+              name: EnableJavaUpdate
+              data: 0
+
+      tasks:
+        - name: Disable Java Update
+          win_regedit:
+            path: "{{ _disable_java_update[0].path }}"
+            name: "{{ _disable_java_update[0].name }}"
+            data: "{{ _disable_java_update[0].data }}"
+            type: DWORD
+            state: present
+...
