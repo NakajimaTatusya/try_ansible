@@ -1,49 +1,80 @@
 ---
     # 日付フォーマットと日付でファイル名の例
     # !!!ファクト情報収集の実行は必須!!!
-  - hosts: windows
+  - hosts: winsvr
     gather_facts: true
 
+    vars:
+        remote_logfile_path: C:\tmp\ansible_win_update_{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}.log
+
     tasks:
-      - debug:
-          var=ansible_date_time.date
-      - debug:
-          var: ansible_date_time.day
-      - debug: msg="{{ ansible_date_time.epoch }}"
-      - debug:
-          msg="{{ ansible_date_time.hour }}"
-      - debug:
-          msg: "{{ ansible_date_time.iso8601 }}"
-      - debug:
-          msg: "{{ ansible_date_time.iso8601_basic }}"
-      - debug:
-          msg: "{{ ansible_date_time.iso8601_basic_short }}"
-      - debug:
-          msg: "{{ ansible_date_time.iso8601_micro }}"
-      - debug:
-          msg: "{{ ansible_date_time.minute }}"
-      - debug:
-          msg: "{{ ansible_date_time.month }}"
-      - debug:
-          msg: "{{ ansible_date_time.second }}"
-      - debug:
-          msg: "{{ ansible_date_time.time }}"
-      - debug:
-          msg: "{{ ansible_date_time.tz }}"
-      - debug:
-          msg: "{{ ansible_date_time.tz_offset }}"
-      - debug:
-          msg: "{{ ansible_date_time.weekday }}"
-      - debug:
-          msg: "{{ ansible_date_time.weekday_number }}"
-      - debug:
-          msg: "{{ ansible_date_time.weeknumber }}"
-      - debug:
-          msg: "{{ ansible_date_time.year }}"
-      - debug:
-          msg: "{{ lookup('pipe', 'date') }}"
-      - debug:
-          msg: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}"
-      - debug:
-          msg: "ansible_win_update_{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}.log"
+        - name: 変数が参照されるたびに評価されるので、パワーシェルで取得する
+          win_shell: Get-Date -Format "yyyyMMddHHmmss"
+          register: _result_datetime_string
+
+        - debug:
+            var: _result_datetime_string
+
+        - name: ファイルをデバック表示、日付の最後の\r\nを削除
+          debug:
+            msg: "C:\\tmp\\ansible_win_update_{{ inventory_hostname }}_{{ _result_datetime_string.stdout | regex_replace('\\r\\n', '') }}.log"
+
+        # ローカルアクションで取得する
+        - name: get a datetime of local action
+          local_action: command date +%Y%m%d%H%M%S
+          register: _result_local_action
+
+        - debug:
+            var: _result_local_action
+
+        - debug:
+            msg: "C:\\tmp\\ansible_win_update_{{ inventory_hostname }}_{{ _result_local_action.stdout }}.log"
+   
+        - debug:
+            var=ansible_date_time.date
+        - debug:
+            var: ansible_date_time.day
+        - debug: msg="{{ ansible_date_time.epoch }}"
+        - debug: msg="{{ ansible_date_time.hour }}"
+        - debug:
+            msg: "{{ ansible_date_time.iso8601 }}"
+        - debug:
+            msg: "{{ ansible_date_time.iso8601_basic }}"
+        - debug:
+            msg: "{{ ansible_date_time.iso8601_basic_short }}"
+        - debug:
+            msg: "{{ ansible_date_time.iso8601_micro }}"
+        - debug:
+            msg: "{{ ansible_date_time.minute }}"
+        - debug:
+            msg: "{{ ansible_date_time.month }}"
+        - debug:
+            msg: "{{ ansible_date_time.second }}"
+        - debug:
+            msg: "{{ ansible_date_time.time }}"
+        - debug:
+            msg: "{{ ansible_date_time.tz }}"
+        - debug:
+            msg: "{{ ansible_date_time.tz_offset }}"
+        - debug:
+            msg: "{{ ansible_date_time.weekday }}"
+        - debug:
+            msg: "{{ ansible_date_time.weekday_number }}"
+        - debug:
+            msg: "{{ ansible_date_time.weeknumber }}"
+        - debug:
+            msg: "{{ ansible_date_time.year }}"
+        - debug:
+            msg: "{{ lookup('pipe', 'date') }}"
+        - debug:
+            msg: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}"
+        - debug:
+            msg: "ansible_win_update_{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}.log"
+        - debug:
+            msg: "{{ remote_logfile_path }}"
+#      - name: pause
+#        pause:
+#            seconds: 5
+        - debug:
+            msg: "{{ remote_logfile_path }}"
 ...
