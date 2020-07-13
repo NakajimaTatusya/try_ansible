@@ -1,39 +1,42 @@
 ---
-    - name: Windows Update by Ansible
-      hosts: winsvr
-      gather_facts: false
+  - name: Windows Update by Ansible
+    hosts: winsvr
+    gather_facts: true
 
-      vars:
-        remote_logfile_path: C:\tmp\win_update_log_{{ inventory_hostname }}.log
-        local_logfile_path: /tmp/ansible_logs/
+    vars:
+      remote_logfile_path: C:\tmp\ansible_win_update_{{ inventory_hostname }}_{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}.log
+      local_logfile_path: /tmp/ansible_logs/
 
-      tasks:
-        - name: Do Windows Update
-          win_updates:
-            category_names:
-              - Application
-              - CriticalUpdates
-              - DefinitionUpdates
-              - SecurityUpdates
-              - UpdateRollups
-              - Updates
-            log_path: "{{ remote_logfile_path }}"
-            server_selection: windows_update
-            state: installed
-          register: update_result
+    tasks:
+      - name: Do Windows Update
+        win_updates:
+          category_names:
+            - Application
+            - CriticalUpdates
+            - DefinitionUpdates
+            - SecurityUpdates
+            - UpdateRollups
+            - Updates
+            - ServicePacks
+            - FeaturePacks
+          log_path: "{{ remote_logfile_path }}"
+          server_selection: windows_update
+          state: installed
+        register: update_result
 
-        - name: Debug display update results
-          debug:
-            var: update_result
-            verbosity: 0
+      - name: Debug display update results
+        debug:
+          var: update_result
+          verbosity: 0
 
-        - name: reboot if needed
-          win_reboot:
-          when: update_result.reboot_required
+      - name: Get a win_update log file from a remote Windows server.
+        fetch:
+          src: "{{ remote_logfile_path }}"
+          dest: "{{ local_logfile_path }}"
+          flat: yes
 
-        - name: Get a win_update log file from a remote Windows server.
-          fetch: 
-            src: "{{ remote_logfile_path }}"
-            dest: "{{ local_logfile_path }}"
-            flat: yes
+      - name: reboot if needed
+        win_reboot:
+          reboot_timeout: 3600
+        when: update_result.reboot_required
 ...
