@@ -1,0 +1,22 @@
+---
+    # 光学ディスクのドライブレターをQにする
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: get current optical drive letter
+          win_shell: |
+            (Get-Volume | ?{$_.DriveType -match 'CD-ROM'}).driveletter
+          register: _result_driveletter
+
+        - name: set Q to the optical drive letter
+          win_shell: |
+            $driveLetter = "DriveLetter = '" + (Get-Volume | ?{$_.DriveType -match 'CD-ROM'}).driveletter + ":'"
+            $drive =  Get-WmiObject -Class win32_volume -Filter $driveLetter
+            Set-WmiInstance -input $drive -Arguments @{DriveLetter="Q:"}
+          register: _result_ps
+          when: _result_driveletter.stdout_lines[0] != "Q"
+
+        - debug:
+            var: _result_ps
+...
