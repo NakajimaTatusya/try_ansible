@@ -1,0 +1,26 @@
+---
+  # Windows defender を完全に無効にする
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: check windows defender status
+          win_shell: Get-WindowsFeature Windows-Defender* | Where-Object {$_.InstallState -eq 'Installed'}
+          register: _result_query
+
+        #- debug:
+        #    var: _result_query
+
+        - name: remove windows defender
+          win_shell: Uninstall-WindowsFeature -Name Windows-Defender
+          register: _resutl_uninstall
+          when: _result_query.stdout != ""
+
+        - debug:
+            var: _resutl_uninstall
+
+        - name: reboot
+          win_reboot:
+            reboot_timeout: 3600
+          when: _resutl_uninstall.rc == 0
+...
