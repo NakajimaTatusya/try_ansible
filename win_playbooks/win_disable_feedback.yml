@@ -1,0 +1,14 @@
+---
+    # フィードバックと診断通知を無効にする
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: Disable notification feedback
+          win_regedit:
+            path: HKLM:\Software\Policies\Microsoft\Windows\DataCollection
+            name: DoNotShowFeedbackNotifications
+            data: 0 # 0：無効、1：有効
+            type: DWORD
+            state: present
+...
