@@ -1,0 +1,107 @@
+---
+  # start page 設定より先に行うこと！
+  # インターネットエクスプローラーのセキュリティ強化の構成
+    - hosts: winsvr
+      gather_facts: false
+
+      vars:
+        _admin_key: HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}
+        _user_key: HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}
+        _current_user_key1: HKCU:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7‐37EF‐4b3f‐8CFC‐4F3A74704073}
+        _current_user_key2: HKCU:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8‐37EF‐4b3f‐8CFC‐4F3A74704073}
+        _first_home_page: HKCU:\Software\Microsoft\Internet Explorer\Main
+        _first_home_page_value: First Home Page
+        _first_home_page_data: res://iesetup.dll/HardAdmin.htm
+
+      tasks:
+        - name: IsInstalled ie security configration for administrator
+          win_shell: |
+            Get-ItemProperty -Path "{{ _admin_key }}" -Name "IsInstalled" | Select-Object -Property IsInstalled | ConvertTo-Json
+          register: _result_adm_is_installed
+
+        - debug:
+            var: _result_adm_is_installed
+
+        - name: IsInstalled ie security configration for user
+          win_shell: |
+            Get-ItemProperty -Path "{{ _user_key }}" -Name "IsInstalled" | Select-Object -Property IsInstalled | ConvertTo-Json
+          register: _result_usr_is_installed
+
+        - debug:
+            var: _result_usr_is_installed
+
+        - name: IE enhanced security configration has been disabeld for administrator
+          win_shell: |
+            Set-ItemProperty -Path "{{ _admin_key }}" -Name "IsInstalled" -Value 0
+          when: not hv_esc_flag and "1" in _result_adm_is_installed.stdout
+        
+        - name: IE enhanced security configration has been enabled for administrator
+          win_shell: |
+            Set-ItemProperty -Path "{{ _admin_key }}" -Name "IsInstalled" -Value 1
+          when: hv_esc_flag and "1" not in _result_adm_is_installed.stdout
+
+        - name: IE enhanced security configration has been disabeld for user
+          win_shell: |
+            Set-ItemProperty -Path "{{ _user_key }}" -Name "IsInstalled" -Value 0
+          when: not hv_esc_flag and "1" in _result_usr_is_installed.stdout
+          
+        - name: IE enhanced security configration has been enabled for user
+          win_shell: |
+            Set-ItemProperty -Path "{{ _user_key }}" -Name "IsInstalled" -Value 1
+          when: hv_esc_flag and "1" not in _result_usr_is_installed.stdout
+
+        - name: setup internet explorer
+          win_shell: |
+            Rundll32 iesetup.dll, IEHardenLMSettings
+            Rundll32 iesetup.dll, IEHardenUser
+            Rundll32 iesetup.dll, IEHardenAdmin
+          #when: (not hv_esc_flag and "1" in _result_adm_is_installed.stdout) or (not hv_esc_flag and "1" in _result_usr_is_installed.stdout)
+
+        - name: delete registory admin key1
+          win_regedit:
+            path: "{{ _current_user_key1 }}"
+            state: absent
+            delete_key: yes
+          when: not hv_esc_flag and "1" in _result_adm_is_installed.stdout
+
+        - name: create registry admin key1
+          win_regedit:
+            path: "{{ _current_user_key1 }}"
+            state: present
+          when: hv_esc_flag and "1" not in _result_adm_is_installed.stdout
+
+        - name: delete registory user key2
+          win_regedit:
+            path: "{{ _current_user_key2 }}"
+            state: absent
+            delete_key: yes
+          when: not hv_esc_flag and "1" in _result_usr_is_installed.stdout
+
+        - name: create registory user key2
+          win_regedit:
+            path: "{{ _current_user_key2 }}"
+            state: present
+          when: hv_esc_flag and "1" not in _result_usr_is_installed.stdout
+
+        - name: delete registory first home page
+          win_regedit:
+            path: "{{ _first_home_page }}"
+            name: "{{ _first_home_page_value }}"
+            state: absent
+          when: (not hv_esc_flag and "1" in _result_adm_is_installed.stdout) or (not hv_esc_flag and "1" in _result_usr_is_installed.stdout)
+
+        - name: create registory first home page
+          win_regedit:
+            path: "{{ _first_home_page }}"
+            name: "{{ _first_home_page_value }}"
+            data: "{{ _first_home_page_data }}"
+            state: present
+          when: (hv_esc_flag and "1" not in _result_adm_is_installed.stdout) or (hv_esc_flag and "1" not in _result_usr_is_installed.stdout)
+
+        #- name: reboot Explorer
+        #  win_shell: |
+        #    Stop-Process -Name Explorer -Force
+        - name: reboot system
+          win_reboot:
+            reboot_timeout: 3600
+...
