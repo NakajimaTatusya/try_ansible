@@ -1,5 +1,7 @@
 ---
-    - hosts: winsvr
+# IE Proxy 設定をクリアする（User）
+    - name: IE Proxy 設定をクリアする（User）
+      hosts: winsvr
       gather_facts: false
 
       tasks:
