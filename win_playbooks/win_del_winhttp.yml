@@ -1,6 +1,7 @@
 ---
-    # netsh winhttp show proxy
-    - hosts: winsvr
+    # Winhttp proxy 設定のクリア
+    - name: Winhttp proxy 設定のクリア
+      hosts: winsvr
       gather_facts: false
 
       tasks:
