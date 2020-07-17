@@ -1,0 +1,25 @@
+---
+  - name: アンインストール CLAMWIN ウイルス対策
+    hosts: winsvr
+    gather_facts: false
+
+    vars:
+      _path_uninstaller: C:\Program Files (x86)\ClamWin\unins000.exe
+
+    tasks:
+      - name: uninstall antivirus
+        win_command: |
+          "{{ _path_uninstaller }}" /SILENT
+        register: _result_uninst
+
+      - name: display _result_uninst
+        debug:
+          msg: "uninstall successed."
+        when: _result_uninst.rc == 0
+
+      - name: purge uninstall uninstall
+        win_file:
+          path: "{{ _path_uninstaller }}"
+          state: absent
+        when: _result_uninst.rc == 0
+...
