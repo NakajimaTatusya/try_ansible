@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: 静的IPアドレスを設定する
+      hosts: winsvr
       gather_facts: true
 
       tasks:
