@@ -1,6 +1,7 @@
 ---
-    # NIC 複数の対応をどうすっか
-    - hosts: winsvr
+    # NIC 複数の対応は後で
+    - name: WINS サーバーの設定を行う
+      hosts: winsvr
       gather_facts: false
 
       tasks:
