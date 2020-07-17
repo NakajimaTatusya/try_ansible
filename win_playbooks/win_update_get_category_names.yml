@@ -1,5 +1,5 @@
 ---
-    - name: Windows Update by Ansible
+    - name: get Windows Update category by Ansible
       hosts: winsvr
       gather_facts: false
 
