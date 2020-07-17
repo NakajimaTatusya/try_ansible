@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: 共有隠しフォルダの設定
+      hosts: winsvr
       gather_facts: false
 
       tasks:
