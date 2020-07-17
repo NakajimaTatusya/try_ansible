@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: IE proxy の設定を行う（user)
+      hosts: winsvr
       gather_facts: false
 
       tasks:
