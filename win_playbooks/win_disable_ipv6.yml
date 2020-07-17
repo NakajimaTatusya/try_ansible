@@ -1,14 +1,15 @@
 ---
-    - hosts: winsvr
+    - name: IPv6 を無効にする
+      hosts: winsvr
       gather_facts: true
 
       tasks:
-        - name: IPv6 を無効にする
+        - name: disable ipv6
           win_shell: Disable-NetAdapterBinding -Name "イーサネット" -ComponentID ms_tcpip6
           async: 100
           poll: 0
 
-        - name: 設定状態を確認する
+        - name: confirm ipv6
           win_shell: Get-NetAdapterBinding -Name "イーサネット"-ComponentID ms_tcpip6
           register: _result_status
 
