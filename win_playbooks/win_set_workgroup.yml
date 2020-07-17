@@ -1,9 +1,10 @@
 ---
-    - hosts: winsvr
+    - name: ワークグループを設定する
+      hosts: winsvr
       gather_facts: false
 
       tasks:
-        - name: "ワークグループを設定する"
+        - name: set workgroup
           win_domain_membership:
             workgroup_name: "{{ hv_workgroup_name }}"
             domain_admin_user: "{{ hv_domain_admin_user }}"
@@ -11,7 +12,7 @@
             state: "{{ hv_win_domain_membership_state }}"
           register: _result_domain_membership
 
-        - name: "再起動の実行"
+        - name: do reboot
           win_reboot:
           when: _result_domain_membership.reboot_required
 ...
