@@ -1,9 +1,10 @@
 ---
-  - hosts: winsvr
+  - name: get defaultgateway information
+    hosts: winsvr
     gather_facts: false
 
     tasks:
-      - name: "DefaultGatewayが設定存在するか確認する"
+      - name: "DefaultGatewayの設定が存在するか確認する"
         win_shell: "{% raw %}Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object{$_.IPEnabled -eq 'TRUE'} | Format-List DefaultIPGateway{% endraw %}"
         register: _result_shell
 
