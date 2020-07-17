@@ -3,11 +3,11 @@
   hv_default_gateway: 192.168.1.1
   vh_dns_ipv4: 
     - 192.168.1.1
-  hv_host_name: <<有効な値に変更してください>>
-  hv_dns_domain_name: <<有効な値に変更してください>>
-  hv_domain_admin_password: <<有効な値に変更してください>>
-  hv_domain_admin_user: <<有効な値に変更してください>>
-  hv_domain_ou_path: "<<有効な値に変更してください>>"
-  hv_win_domain_membership_state: <<有効な値に変更してください>>
-  hv_workgroup_name: <<有効な値に変更してください>>
+  hv_host_name: WIN-7NKMAB2FAN5
+  hv_dns_domain_name: testDomainName
+  hv_domain_admin_password: Passw0rd
+  hv_domain_admin_user: administrator
+  hv_domain_ou_path: "OU=Windows,OU=Servers,DC=ansible,DC=vagrant"
+  hv_win_domain_membership_state: workgroup
+  hv_workgroup_name: ansibleWkgrp
 ...
