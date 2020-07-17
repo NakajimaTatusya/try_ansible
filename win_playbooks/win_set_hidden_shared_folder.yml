@@ -1,0 +1,20 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      tasks:
+        - name: Create folder if not exists
+          win_file:
+            path: "{{ hv_hidden_shared_folder }}"
+            state: directory
+
+        - name: hidden shared folder settings
+          win_share:
+            name: tmp$
+            description: created hidden shared folder by ansible
+            path: "{{ hv_hidden_shared_folder }}"
+            list: no
+            full: Administrator
+            read: everyone
+            state: present
+...
