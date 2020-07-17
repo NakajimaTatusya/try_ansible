@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: Java Update の無効化
+      hosts: winsvr
       gather_facts: false
 
       vars:
@@ -9,11 +10,12 @@
               data: 0
 
       tasks:
-        - name: Disable Java Update
+        - name: disable Java Update
           win_regedit:
-            path: "{{ _disable_java_update[0].path }}"
-            name: "{{ _disable_java_update[0].name }}"
-            data: "{{ _disable_java_update[0].data }}"
+            path: "{{ item.path }}"
+            name: "{{ item.name }}"
+            data: "{{ item.data }}"
             type: DWORD
             state: present
+          with_items: "{{ _disable_java_update }}"
 ...
