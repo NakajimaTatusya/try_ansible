@@ -1,6 +1,6 @@
 ---
-    # 光学ディスクのドライブレターをQにする
-    - hosts: winsvr
+    - name: 光学ディスクのドライブレターを Q にする
+      hosts: winsvr
       gather_facts: false
 
       tasks:
