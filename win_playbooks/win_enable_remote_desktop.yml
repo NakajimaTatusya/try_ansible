@@ -1,0 +1,66 @@
+---
+    # !!!!!!!!!! - 注意 - !!!!!!!!!!
+    # リモートデスクトップ接続を許可しても、Windows Update を適応していないと、認証プロバイダ（CredSSP）のバージョンが一致せずに接続できないことがある。
+    - hosts: winsvr
+      gather_facts: false
+
+      vars:
+        _remote_desktop:
+            - path: HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server
+              name: fDenyTSConnections
+              data: 0
+            - path: HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance
+              name: fAllowToGetHelp
+              data: 0
+            - path: HKLM:\System\CurrentControlSet\Control\Terminal Server
+              name: fSingleSessionPerUser
+              data: 0
+            - path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+              name: fDisableCdm
+              data: 0
+        _firewall_rules:
+            - name: リモート デスクトップ - シャドウ (TCP 受信)
+              localport: any
+              remoteport: any
+              action: allow
+              direction: in
+              protocol: tcp
+              profiles: domain,private,public
+            - name: リモート デスクトップ - ユーザー モード (TCP 受信)
+              localport: 3389
+              remoteport: any
+              action: allow
+              direction: in
+              protocol: tcp
+              profiles: domain,private,public
+            - name: リモート デスクトップ - ユーザー モード (UDP 受信)
+              localport: 3389
+              remoteport: any
+              action: allow
+              direction: in
+              protocol: udp
+              profiles: domain,private,public
+
+      tasks:
+        - name: Enable Registry Remote Desktop
+          win_regedit:
+            path: "{{ item.path }}"
+            name: "{{ item.name }}"
+            data: "{{ item.data }}"
+            type: DWORD
+            state: present
+          with_items: "{{ _remote_desktop }}"
+
+        - name: Firewall Rule to allow RDP
+          win_firewall_rule:
+            name: "{{ item.name }}"
+            localport: "{{ item.localport }}"
+            remoteport: "{{ item.remoteport }}"
+            action: "{{ item.action }}"
+            direction: "{{ item.direction }}"
+            protocol: "{{ item.protocol }}"
+            profiles: "{{ item.profiles }}"
+            state: present
+            enabled: yes
+          with_items: "{{ _firewall_rules }}"
+...
