@@ -1,0 +1,26 @@
+---
+  - name: インストール CLAMWIN アンチウイルスソフト
+    hosts: winsvr
+    gather_facts: false
+    
+    vars:
+      local_path: ~/apps/clamwin-0.99.4-setup.exe
+      remote_path: c:\tmp\clamwin-0.99.4-setup.exe
+
+    tasks:
+      - name: send antivirus installer
+        win_copy:
+          src: "{{ local_path }}"
+          dest: "{{ remote_path }}"
+        register: _result_file_cpy
+
+      - name: silent install
+        win_command: |
+          "{{ remote_path }}" /sp- /silent /norestart
+        when: _result_file_cpy.operation == "file_copy"
+
+      - name: clean up installer file in tmp directory
+        win_file:
+          path: "{{ remote_path }}"
+          state: absent
+...
