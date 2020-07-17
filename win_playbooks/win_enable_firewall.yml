@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: ファイアウォールの有効化
+      hosts: winsvr
       gather_facts: false
 
       tasks:
