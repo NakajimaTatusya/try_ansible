@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: 疎通確認と facts の収集
+      hosts: winsvr
       gather_facts: true
 
       tasks:
