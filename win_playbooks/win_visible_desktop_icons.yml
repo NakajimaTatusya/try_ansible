@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: デスクトップアイコンの表示（PC、ごみ箱、ユーザーフォルダ、コントロールパネル、ネットワーク）
+      hosts: winsvr
       gather_facts: false
 
       vars:
