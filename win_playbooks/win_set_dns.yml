@@ -1,15 +1,15 @@
 ---
-  - hosts: winsvr
-    gather_facts: false
+    - hosts: winsvr
+      gather_facts: false
 
-    tasks:
-      - name: "DNSをクリアする"
-        win_dns_client:
-          adapter_name: "イーサネット"
-          ipv4_addresses: []
+      tasks:
+        - name: "DNSをクリアする"
+          win_dns_client:
+            adapter_name: "イーサネット"
+            ipv4_addresses: []
 
-      - name: "DNSを設定する"
-        win_dns_client:
-          adapter_name: "イーサネット"
-          ipv4_addresses: "{{ vh_dns_ipv4 }}"
+        - name: "DNSを設定する"
+          win_dns_client:
+            adapter_name: "イーサネット"
+            ipv4_addresses: "{{ vh_dns_ipv4 }}"
 ...
