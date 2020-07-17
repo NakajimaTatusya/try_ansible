@@ -1,9 +1,10 @@
 ---
-    - hosts: winsvr
+    - name: インターネットエクスプローラーのスタートページを設定する
+      hosts: winsvr
       gather_facts: false
 
       tasks:
-        - name: "インターネットエクスプローラーのスタートページを設定する"
+        - name: set internet explorer start page
           win_regedit:
             path: HKCU:\Software\Microsoft\Internet Explorer\Main\
             name: start page
