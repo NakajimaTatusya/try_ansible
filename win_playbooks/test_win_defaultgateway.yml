@@ -1,0 +1,27 @@
+---
+  - hosts: winsvr
+    gather_facts: false
+
+    tasks:
+      - name: "DefaultGatewayが設定存在するか確認する"
+        win_shell: "{% raw %}Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object{$_.IPEnabled -eq 'TRUE'} | Format-List DefaultIPGateway{% endraw %}"
+        register: _result_shell
+
+      #- name: デフォルトゲートウェイ確認結果
+      #  debug:
+      #    var: _result_shell
+
+      - name: 標準出力の表示
+        debug:
+          msg: "{{ _result_shell.stdout }}"
+
+      #- debug:
+      #    msg: "{{ 'Some DNS servers are 8.8.8.8 and 8.8.4.4' | regex_findall('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b') }}"
+
+      - debug:
+          msg: "{{ _result_shell.stdout | regex_findall('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b') }}"
+      
+      - debug:
+          msg: "DefaultGateway entered"
+        when: _result_shell.stdout | regex_findall('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b') == hv_default_gateway
+...
