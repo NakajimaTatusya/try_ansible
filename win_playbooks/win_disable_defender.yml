@@ -1,6 +1,7 @@
 ---
   # Windows defender を完全に無効にする
-    - hosts: winsvr
+    - name: Windows defender を完全に無効にする
+      hosts: winsvr
       gather_facts: false
 
       tasks:
