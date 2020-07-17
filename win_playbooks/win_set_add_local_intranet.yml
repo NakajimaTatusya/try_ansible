@@ -1,0 +1,99 @@
+---
+    - hosts: winsvr
+      gather_facts: false
+
+      # 一応レジストリの値は変更されたが、IEのGUIで見ると設定項目が違うようで「イントラネットのネットワークを自動的に検出する」がない。
+      # Serverだと違うのかも・・・
+      
+      # Module URL
+      # https://docs.ansible.com/ansible/latest/modules/win_regedit_module.html#win-regedit-module
+      # Registory Path 候補
+      # HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+      # HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges
+      # HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
+      # HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+      # HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges
+      # HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
+      # HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+      # HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges
+      # HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
+
+      tasks:
+        #path: HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+        # 「イントラネットのネットワークを自動的に検出する」チェック外す=0
+        - name: Disable automatic detection of intranet network
+          win_regedit:
+            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+            name: AutoDetect
+            data: 0
+            type: DWORD
+            state: present
+
+        # 「ほかのゾーンに指定されていないローカル（イントラネット）のサイトをすべて含める」にチェックする=1
+        - name: Include all local intranet sites that are not specified in other zones
+          win_regedit:
+            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+            name: IntranetName
+            data: 1
+            type: DWORD
+            state: present
+
+        # 「プロキシサーバーを使用しないサイトをすべて含める」にチェック=1
+        - name: Include all sites that are not use proxy server
+          win_regedit:
+            path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+            name: ProxyByPass
+            data: 1
+            type: DWORD
+            state: present
+
+        # 「すべてのネットワークパス（UNC)を含める」にチェック=1
+        - name: Include all UNC
+          win_regedit:
+            path: HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+            name: UNCAsIntranet
+            data: 1
+            type: DWORD
+            state: present
+
+        #path: "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Ranges"
+        # イントラネットのURLの登録
+        - name: Create Range path
+          win_regedit:
+            path: "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\Ranges\\Range{{ item.suffix_num }}"
+          with_items: "{{ gv_list_add_url }}"
+
+        - name: Create :Range key
+          win_regedit:
+            path: "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\Ranges\\Range{{ item.suffix_num }}"
+            name: :Range
+            data: "{{ item.ipaddress_data }}"
+            type: string
+            state: present
+          with_items: "{{ gv_list_add_url }}"
+
+        - name: Create protocol key
+          win_regedit:
+            path: "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\Ranges\\Range{{ item.suffix_num }}"
+            name: "{{ item.protocol_name }}"
+            data: "{{ item.protocol_id }}"
+            type: DWORD
+            state: present
+          with_items: "{{ gv_list_add_url }}"
+
+        #path: "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\Domains"
+        # イントラネットのドメインの登録
+        - name: Create domain path
+          win_regedit:
+            path: "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\Domains\\{{ item.domain_string }}"
+          with_items: "{{ gv_list_add_domain }}"
+
+        - name: Create protocol key for domain
+          win_regedit:
+            path: "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\Domains\\{{ item.domain_string }}"
+            name: "{{ item.protocol_name }}"
+            data: "{{ item.protocol_id }}"
+            type: DWORD
+            state: present
+          with_items: "{{ gv_list_add_domain }}"
+...
