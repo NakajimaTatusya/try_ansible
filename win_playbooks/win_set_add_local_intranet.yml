@@ -1,5 +1,8 @@
 ---
-    - hosts: winsvr
+# IE Local intranet 設定を行う（方法は別途確認）
+# PowerShell も考慮
+    - name: IE Local intranet 設定を行う（方法は別途確認）
+      hosts: winsvr
       gather_facts: false
 
       # 一応レジストリの値は変更されたが、IEのGUIで見ると設定項目が違うようで「イントラネットのネットワークを自動的に検出する」がない。
