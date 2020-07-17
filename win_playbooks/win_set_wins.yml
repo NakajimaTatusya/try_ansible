@@ -1,52 +1,52 @@
 ---
-  # NIC 複数の対応をどうすっか
-  - hosts: winsvr
-    gather_facts: false
+    # NIC 複数の対応をどうすっか
+    - hosts: winsvr
+      gather_facts: false
 
-    tasks:
-      #- name: nested loop
-      #  debug:
-      #    msg: "{{ item.0.interface_name }},{{ item.1.ipaddress }},{{ item.1.index }}"
-      #  loop: "{{ gv_wins_ipaddress | subelements('wins_settings') }}"
-      #  loop_control:
-      #    label: "{{ item.0.interface_name }}"
-      #  tags: test_nested_loop
+      tasks:
+        #- name: nested loop
+        #  debug:
+        #    msg: "{{ item.0.interface_name }},{{ item.1.ipaddress }},{{ item.1.index }}"
+        #  loop: "{{ gv_wins_ipaddress | subelements('wins_settings') }}"
+        #  loop_control:
+        #    label: "{{ item.0.interface_name }}"
+        #  tags: test_nested_loop
+  
+        - name: get config
+          win_command: netsh interface ipv4 show winsservers name={{ item.interface_name }}
+          with_items: "{{ gv_wins_ipaddress }}"
+          register: _result_config
+          tags: netsh_config
 
-      - name: get config
-        win_command: netsh interface ipv4 show winsservers name={{ item.interface_name }}
-        with_items: "{{ gv_wins_ipaddress }}"
-        register: _result_config
-        tags: netsh_config
+        - name: debug display
+          debug:
+        #    msg: "{{ _result_config.stdout }}"
+            msg: "{{ item.stdout | regex_search('None') }}"
+        #    var: _result_config
+          with_items: "{{ _result_config.results }}"
+          tags: netsh_config
 
-      - name: debug display
-        debug:
-      #    msg: "{{ _result_config.stdout }}"
-          msg: "{{ item.stdout | regex_search('None') }}"
-      #    var: _result_config
-        with_items: "{{ _result_config.results }}"
-        tags: netsh_config
+        - name: delete WINS
+          win_command: netsh interface ipv4 delete winsservers {{ item.0.interface_name }} {{ item.1.ipaddress }}
+          loop: "{{ gv_wins_ipaddress | subelements('wins_settings') }}"
+          register: _result_delete
+          when: _result_config.results[0].stdout | regex_search('None') != "None"
+          tags: delete_wins
 
-      - name: delete WINS
-        win_command: netsh interface ipv4 delete winsservers {{ item.0.interface_name }} {{ item.1.ipaddress }}
-        loop: "{{ gv_wins_ipaddress | subelements('wins_settings') }}"
-        register: _result_delete
-        when: _result_config.results[0].stdout | regex_search('None') != "None"
-        tags: delete_wins
+        - name: debug display delete resutl
+          debug:
+            var: _result_delete
+          when: _result_config.results[0].stdout | regex_search('None') != "None"
+          tags: delete_wins
 
-      - name: debug display delete resutl
-        debug:
-          var: _result_delete
-        when: _result_config.results[0].stdout | regex_search('None') != "None"
-        tags: delete_wins
+        - name: Set WINS
+          win_command: netsh interface ipv4 add winsservers {{ item.0.interface_name }} {{ item.1.ipaddress }} index={{ item.1.index }}
+          loop: "{{ gv_wins_ipaddress | subelements('wins_settings') }}"
+          register: _result_cmd
+          tags: set_wins
 
-      - name: Set WINS
-        win_command: netsh interface ipv4 add winsservers {{ item.0.interface_name }} {{ item.1.ipaddress }} index={{ item.1.index }}
-        loop: "{{ gv_wins_ipaddress | subelements('wins_settings') }}"
-        register: _result_cmd
-        tags: set_wins
-
-      - name: display resutl
-        debug:
-          var: _result_cmd
-        tags: set_wins
+        - name: display resutl
+          debug:
+            var: _result_cmd
+          tags: set_wins
 ...
