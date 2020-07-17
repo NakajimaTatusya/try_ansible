@@ -1,7 +1,8 @@
 ---
   # start page 設定より先に行うこと！
   # インターネットエクスプローラーのセキュリティ強化の構成
-    - hosts: winsvr
+    - name: インターネットエクスプローラーのセキュリティ強化の構成
+      hosts: winsvr
       gather_facts: false
 
       vars:
