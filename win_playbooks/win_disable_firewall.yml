@@ -1,5 +1,6 @@
 ---
-    - hosts: winsvr
+    - name: ファイアウォールの Domain、Private、Public 無効にする
+      hosts: winsvr
       gather_facts: false
 
       tasks:
