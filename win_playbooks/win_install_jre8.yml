@@ -1,0 +1,67 @@
+---
+  # JRE 8u261 のリモートインストール
+  - name: silent install java runtime enveronment
+    hosts: winsvr
+    gather_facts: false
+
+    vars:
+      _local_installer_path: ~/apps/jre-8u261-windows-x64.exe
+      _remote_installer_path: c:\tmp\jre-8u261-windows-x64.exe
+      _local_config_path: ~/apps/silent_jre_install.cfg
+      _remote_config_path: c:\tmp\silent_jre_install.cfg
+      _remote_log_path: c:\tmp\jre-8u261-windows-x64.install.log
+      _local_logfile_path: /tmp/ansible_logs/
+      _registory_key: Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment
+
+    tasks:
+      - name: check installed jre
+        win_shell: |
+          if (Get-WmiObject -Class Win32_Product -Filter "Name like 'Java%'" | Select -Expand Version) { Write-Host 0 } else { Write-Host 1 }
+        register: _result_jre
+
+      - debug:
+          var: _result_jre
+
+      - name: copy installer
+        win_copy:
+          src: "{{ _local_installer_path }}"
+          dest: "{{ _remote_installer_path }}"
+        when: _result_jre.stdout_lines[0] == "1"
+
+      - name: copy config file
+        win_copy:
+          src: "{{ _local_config_path }}"
+          dest: "{{ _remote_config_path }}"
+        when: _result_jre.stdout_lines[0] == "1"
+
+      - name: do silent install
+        win_command: |
+          "{{ _remote_installer_path }}" /s INSTALLCFG="{{ _remote_config_path }}" /L "{{ _remote_log_path }}"
+        when: _result_jre.stdout_lines[0] == "1"
+
+      - name: set enveronment variables
+        win_shell: |
+          if (-not (Test-Path env:JAVA_HOME)) {
+            [System.Environment]::SetEnvironmentVariable("JAVA_HOME", "$env:localappdata\Programs\java" ,[System.EnvironmentVariableTarget]::Machine)
+          }
+          $newPath=$env:path + [System.Environment]::GetEnvironmentVariable("JAVA_HOME", "Machine") + "\bin"
+          if ($env:path.Contains($newPath) -ne $true) {
+            Set-ItemProperty -Path "{{ _registory_key }}" -Name PATH -Value $newPath
+          } 
+        when: _result_jre.stdout_lines[0] == "1"
+          
+      - name: confirm installed
+        win_command: |
+          java -version
+        register: _result_installed
+
+      - debug:
+          var: _result_installed
+
+      - name: get install jre-8u261-windows-x64.install.log
+        fetch:
+          src: "{{ _remote_log_path }}"
+          dest: "{{ _local_logfile_path }}"
+          flat: yes
+        when: _result_jre.stdout_lines[0] == "1"
+...
