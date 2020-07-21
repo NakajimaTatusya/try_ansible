@@ -4,7 +4,7 @@
       gather_facts: true
 
       vars:
-        local_logfile_path: /tmp/ansible_logs/
+        _local_logfile_path: /tmp/ansible_logs/
 
       tasks:
         - name: Get a datetime for logfile name
@@ -39,7 +39,7 @@
         - name: Get a win_update log file from a remote Windows server.
           fetch:
             src: "C:\\tmp\\ansible_win_update_{{ inventory_hostname }}_{{ _result_local_action.stdout }}.log"
-            dest: "{{ local_logfile_path }}"
+            dest: "{{ _local_logfile_path }}"
             flat: yes
 
         - name: reboot if needed
