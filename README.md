@@ -33,7 +33,7 @@
 これらを、変更する。下記参照
 
 * [Add encoding and codepage params to win_command/win_shell (ansible#54896](https://github.com/anshulbehl/ansible/commit/3bd12ed9e7f724bcd9c27fb88a1fb9f60c28c3be)
-* try_ansible\changefiles\
+* try_ansible\custom_win_modules\
 * output_encoding_override の設定値は、[windows encording codepage](https://docs.microsoft.com/ja-jp/dotnet/api/system.text.encoding.getencodings?view=netcore-3.1)を参照
 
 ```yml
