@@ -1,0 +1,42 @@
+---
+  - hosts: winsvr
+    vars:
+      _val_1: "installed: 1"
+      _const_val: "1"
+      _flag: false
+      _condition_1: true
+      _condition_2: true
+      _condition_3: true
+
+    tasks:
+      - debug:
+          msg: "ok"
+        when:
+          - _condition_1 == true
+          - _condition_2 == true
+          - _condition_3 == true
+
+      - debug:
+          msg: "Do ie esc disable"
+        when: not _flag and "1" in _val_1
+
+      - debug:
+          msg: "Do ie esc disable"
+        when:
+          - not _flag
+          - _const_val in _val_1
+
+      # 上記2つの条件式とは意味が異なるようです。
+      - debug:
+          msg: "Do ie esc disable"
+        when:
+          - not _flag
+          - _val_1 in "1"
+
+      # syntax error
+      #- debug:
+      #    msg: "Do ie esc disable"
+      #  when:
+      #    - not _flag
+      #    - "1" in _val_1
+...
