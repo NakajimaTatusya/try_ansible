@@ -37,8 +37,12 @@ winrm get winrm/config
 
 ## BASIC 認証許可
 
+```cmd
 winrm set winrm/config/service/auth '@{Basic="true"}'
+```
 
 ## 平文許可
 
+```cmd
 winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+```
