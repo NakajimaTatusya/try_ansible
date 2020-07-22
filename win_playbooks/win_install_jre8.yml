@@ -37,6 +37,9 @@
       - name: do silent install
         win_command: |
           "{{ _remote_installer_path }}" /s INSTALLCFG="{{ _remote_config_path }}" /L "{{ _remote_log_path }}"
+        # 環境変数が使用できない。cfgファイル内でも使用できない。
+        #win_command: |
+        #  "{{ _remote_installer_path }}" /s AUTO_UPDATE=Disable INSTALL_SILENT=Enable INSTALLDIR=%LOCALAPPDATA%\Programs\java WEB_ANALYTICS=Disable /L "{{ _remote_log_path }}"
         when: _result_jre.stdout_lines[0] == "1"
 
       - name: set enveronment variables
