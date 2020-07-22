@@ -1,4 +1,4 @@
-# Set WinRM TSL Authenticatoin (author:tatsuya.nakajima@jp.ricoh.com)
+# Set WinRM TSL Authenticatoin (author:TatsuyaNakajima)
 
 * Windows10 ＋ WSL1（Ubuntu18.x）で疎通確認済み
 * Windows Server とは検証していませぬ。（お願いします。

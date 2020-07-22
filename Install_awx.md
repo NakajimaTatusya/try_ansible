@@ -1,4 +1,4 @@
-# Ansible AWX Installation Manual (2020/6/18, author:tatsuya.nakajima@jp.ricoh.com)
+# Ansible AWX Installation Manual (2020/6/18, author:TatsuyaNakajima)
 
 ## サーバー情報
 
