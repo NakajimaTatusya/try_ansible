@@ -13,6 +13,7 @@
         _first_home_page: HKCU:\Software\Microsoft\Internet Explorer\Main
         _first_home_page_value: First Home Page
         _first_home_page_data: res://iesetup.dll/HardAdmin.htm
+        _installed_val: "1"
 
       tasks:
         - name: IsInstalled ie security configration for administrator
@@ -34,22 +35,30 @@
         - name: IE enhanced security configration has been disabeld for administrator
           win_shell: |
             Set-ItemProperty -Path "{{ _admin_key }}" -Name "IsInstalled" -Value 0
-          when: not hv_esc_flag and "1" in _result_adm_is_installed.stdout
+          when: 
+            - not hv_esc_flag 
+            - _installed_val in _result_adm_is_installed.stdout
         
         - name: IE enhanced security configration has been enabled for administrator
           win_shell: |
             Set-ItemProperty -Path "{{ _admin_key }}" -Name "IsInstalled" -Value 1
-          when: hv_esc_flag and "1" not in _result_adm_is_installed.stdout
+          when: 
+            - hv_esc_flag 
+            - _installed_val not in _result_adm_is_installed.stdout
 
         - name: IE enhanced security configration has been disabeld for user
           win_shell: |
             Set-ItemProperty -Path "{{ _user_key }}" -Name "IsInstalled" -Value 0
-          when: not hv_esc_flag and "1" in _result_usr_is_installed.stdout
+          when: 
+            - not hv_esc_flag 
+            - _installed_val in _result_usr_is_installed.stdout
           
         - name: IE enhanced security configration has been enabled for user
           win_shell: |
             Set-ItemProperty -Path "{{ _user_key }}" -Name "IsInstalled" -Value 1
-          when: hv_esc_flag and "1" not in _result_usr_is_installed.stdout
+          when: 
+            - hv_esc_flag 
+            - _installed_val not in _result_usr_is_installed.stdout
 
         - name: setup internet explorer
           win_shell: |
@@ -63,26 +72,34 @@
             path: "{{ _current_user_key1 }}"
             state: absent
             delete_key: yes
-          when: not hv_esc_flag and "1" in _result_adm_is_installed.stdout
+          when: 
+            - not hv_esc_flag 
+            - _installed_val in _result_adm_is_installed.stdout
 
         - name: create registry admin key1
           win_regedit:
             path: "{{ _current_user_key1 }}"
             state: present
-          when: hv_esc_flag and "1" not in _result_adm_is_installed.stdout
+          when: 
+            - hv_esc_flag
+            - _installed_val not in _result_adm_is_installed.stdout
 
         - name: delete registory user key2
           win_regedit:
             path: "{{ _current_user_key2 }}"
             state: absent
             delete_key: yes
-          when: not hv_esc_flag and "1" in _result_usr_is_installed.stdout
+          when: 
+            - not hv_esc_flag
+            - _installed_val in _result_usr_is_installed.stdout
 
         - name: create registory user key2
           win_regedit:
             path: "{{ _current_user_key2 }}"
             state: present
-          when: hv_esc_flag and "1" not in _result_usr_is_installed.stdout
+          when: 
+            - hv_esc_flag
+            - _installed_val not in _result_usr_is_installed.stdout
 
         - name: delete registory first home page
           win_regedit:
