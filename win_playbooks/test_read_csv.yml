@@ -1,0 +1,29 @@
+---
+  - name: CSV ファイルからパラメータを取得するテスト
+    hosts: win_test
+    gather_facts: false
+
+    tasks:
+      - name: CSV ファイルを読み込む
+        read_csv:
+          path: ../csv_files/test.csv
+          delimiter: ","
+          key: hostname
+        register: _result_server_parameter
+        delegate_to: localhost
+
+      - debug:
+          var: _result_server_parameter.dict
+
+      - debug:
+          msg: "{{ _result_server_parameter.dict[inventory_hostname].workgroupname }}"
+
+      - debug:
+          msg: "{{ item.memo }}"
+        with_items:
+          - "{{ _result_server_parameter.dict[inventory_hostname] }}"
+
+      - win_command: systeminfo
+        register: _result_info
+      - debug: var=_result_info
+...
