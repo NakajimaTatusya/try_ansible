@@ -9,4 +9,9 @@
 
         - name: get windows server informations
           debug: var=ansible_facts
+
+        - name: systeminfo command
+          win_command: systeminfo
+          register: _result_info
+        - debug: var=_result_info
 ...
