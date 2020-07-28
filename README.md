@@ -8,12 +8,15 @@
 
 ## ディレクトリ構成
 
-* try_ansible\
-  * inventory\
-    * group_vars\
-    * host_vars\
+* try_ansible/
+  * csv_files/
+  * custom_win_modules/
+  * inventory/
+    * group_vars/
+    * host_vars/
     * hosts
-  * win_playbooks\
+  * jre_install_config/
+  * win_playbooks/
     * ansible.cfg
 
 ## システム構成概略
