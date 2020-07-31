@@ -2,25 +2,28 @@
 
 ## ファイル命名規則
 
-- YAML ファイルの拡張子は、".yml"で統一する。
-- ファイル名に使用できる文字は、小文字の英数字と"_"のみとする。
-- Windows 向け PlayBook は、"win_"から開始する。
-- CentOS 向け PlayBook は、"cen_"から開始する。
-- Ubuntu 向け PlayBook は、"ubu_"から開始する。
-- Debian 向け PlayBookは、"deb_"から開始する。
-- PlayBook の名称は、目的を英語でつける。
+- YAML ファイルの拡張子は、".yml"で統一する
+- Inventory ファイルの形式は、YAMLとする
+- ファイル名に使用できる文字は、小文字の英数字と"_"のみとする
+- PlayBook の名称は、目的を英語でつける
+- Windows 向け PlayBook は、"win_"から開始する
+- CentOS 向け PlayBook は、"cen_"から開始する
+- Ubuntu 向け PlayBook は、"ubu_"から開始する
+- Debian 向け PlayBookは、"deb_"から開始する
 
 ## コーディング規約
 
-- PlayBook(YAML FILE) は"---"から開始し、"..."で終了すること！
+- PlayBook(YAML FILE) は"---"から開始し、"..."で終了すること
 - タスクやプレイブック内で宣言した変数は**アンダースコア**から開始する変数名にすること(`_xxx`)
 - `register`の変数名は`_result_xxx`とする
 - Host変数は、`hv_*****`とする
 - Group変数は、`gv_*****`とする
+- Global変数は、`all_*****`とする
+- CSVファイルのヘッダは、`csv_******`とする
 - 変数名、ロール名、playbook名、ファイル名、タスク名の命名規則はスネークケースとする(Ansibleの規約)
 - 変数名の開始文字列に **`ansible_`を使用してはならない**(Ansibleの予約変数名)
-- jinja2テンプレートはファイル名に`j2`を含めること(区別するため)
-- 環境ごとに変数の階層分けする場合は、以下のように命名すること
+- jinja2テンプレートはファイル名に`j2`を含める
+- 環境ごとに変数の階層分けを行う場合は、以下のように命名すること
   - 本番用：`prd`
   - 本番検証用：`prd_dev`
   - システム管理用(ansible、zabbix)：`sys`
