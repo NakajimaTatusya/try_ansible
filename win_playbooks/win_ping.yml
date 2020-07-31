@@ -6,6 +6,11 @@
       tasks:
         - name: ping to windows server
           win_ping:
+          register: _result_ping
+
+        - name: debug
+          debug:
+            var: _result_ping
 
         - name: get windows server informations
           debug: var=ansible_facts
