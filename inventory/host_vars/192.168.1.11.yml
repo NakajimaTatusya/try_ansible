@@ -1,4 +1,5 @@
 ---
+    hv_new_local_adm_psswd: P@ssw0rd-4192
     hv_static_ipv4: 192.168.1.203
     hv_default_gateway: 192.168.1.1
 ...
