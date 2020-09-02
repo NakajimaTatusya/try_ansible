@@ -60,11 +60,11 @@
             - hv_esc_flag 
             - _installed_val not in _result_usr_is_installed.stdout
 
-        - name: setup internet explorer
-          win_shell: |
-            Rundll32 iesetup.dll, IEHardenLMSettings
-            Rundll32 iesetup.dll, IEHardenUser
-            Rundll32 iesetup.dll, IEHardenAdmin
+        #- name: setup internet explorer
+        #  win_shell: |
+        #    Rundll32 iesetup.dll, IEHardenLMSettings
+        #    Rundll32 iesetup.dll, IEHardenUser
+        #    Rundll32 iesetup.dll, IEHardenAdmin
           #when: (not hv_esc_flag and "1" in _result_adm_is_installed.stdout) or (not hv_esc_flag and "1" in _result_usr_is_installed.stdout)
 
         - name: delete registory admin key1
