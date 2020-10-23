@@ -1,0 +1,48 @@
+---
+  - name: Test Windows OS activation
+    hosts: winsvr
+    gather_facts: false
+
+    tasks:
+      - name: License Status の確認
+        win_shell: |
+          $cpname = Get-Content env:computername
+          $cim = New-CimSession -ComputerName $cpname
+          get-ciminstance -class SoftwareLicensingProduct -CimSession $cim | Where-Object {$_.name -match ‘windows’ -AND $_.licensefamily} | Select-Object -property Name, Description, @{Label=”GracePeriod”; Expression={ $_.graceperiodremaining / 1440}}, @{Label= “LicenseStatus”; Expression={switch (ForEach-Object {$_.LicenseStatus}) { 0 {“Unlicensed”} 1 {“Licensed”} 2 {“Out-Of-Box Grace Period”} 3 {“Out-Of-Tolerance Grace Period”} 4 {“Non-Genuine Grace Period”} } } } | Where-Object { $_."LicenseStatus" -eq "Licensed" } | ConvertTo-Json
+        register: _result_license_status
+
+      - set_fact:
+          _license_status: "{{ _result_license_status.stdout }}"
+
+      - debug:
+          msg: "{{ _license_status.GracePeriod }} : {{ _license_status.LicenseStatus }}"
+
+      - debug:
+          msg: "tryal!"
+        when: 
+          - _license_status is defined
+          - _license_status|length > 0
+          - _license_status.GracePeriod != 0
+
+      - name: windows activation を行う
+        win_shell: |
+          $computer = Get-Content env:computername
+          $key = {{ _result_server_parameter.dict[inventory_hostname].csv_product_key }}
+          $service = Get-WmiObject -query "select * from SoftwareLicensingService" -computername $computer
+          $service.InstallProductKey($key)
+          $service.RefreshLicenseStatus()
+        register: _reuslt
+        when: 
+          - _license_status is defined
+          - _license_status|length > 0
+          - _license_status.GracePeriod != 0
+
+      - name: activation 結果
+        win_shell: |
+          Get-CimInstance SoftwareLicensingProduct | Where-Object { $_.PartialProductKey } | Select-Object Description, LicenseStatus
+        register: _result_license_info
+
+      - name: activation 結果
+        debug:
+          var: _result_license_info
+...
